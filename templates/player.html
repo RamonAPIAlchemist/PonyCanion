@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PonyCanion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1DB954;
+            --dark: #121212;
+            --darker: #000;
+            --light: #FFFFFF;
+            --gray: #B3B3B3;
+            --dark-gray: #282828;
+            --medium-gray: #181818;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Circular', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 1fr 90px;
+            height: 100vh;
+            gap: 8px;
+            padding: 8px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 24px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .logo {
+            padding: 0 12px;
+            margin-bottom: 18px;
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            padding: 10px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--medium-gray);
+        }
+        
+        .nav-item.active {
+            background-color: var(--dark-gray);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            background: linear-gradient(var(--medium-gray) 0%, var(--darker) 100%);
+            border-radius: 8px;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 24px;
+        }
+        
+        .search-box {
+            background-color: var(--light);
+            border-radius: 500px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-box button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+            padding: 8px;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 24px 0 16px 0;
+        }
+        
+        .section-header h2 {
+            font-size: 24px;
+        }
+        
+        /* Track List */
+        .tracks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .track-card {
+            background-color: var(--dark-gray);
+            border-radius: 8px;
+            padding: 16px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .track-card:hover {
+            background-color: #333;
+        }
+        
+        .track-card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .track-card h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .track-card p {
+            font-size: 12px;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Player Bar */
+        .player-bar {
+            grid-column: 1 / -1;
+            background-color: var(--dark-gray);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+        }
+        
+        .now-playing {
+            flex: 0 0 300px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .now-playing img {
+            width: 56px;
+            height: 56px;
+            border-radius: 4px;
+        }
+        
+        .track-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .track-info p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .player-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        .play-btn {
+            background-color: var(--light);
+            color: var(--dark);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .progress-time {
+            font-size: 12px;
+            color: var(--gray);
+            min-width: 40px;
+        }
+        
+        .progress-track {
+            flex: 1;
+            height: 4px;
+            background-color: #535353;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 2px;
+            width: 30%;
+        }
+        
+        .volume-control {
+            flex: 0 0 200px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-horse"></i> PonyCanion</h1>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-item active" onclick="loadSection('home')">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </div>
+                <div class="nav-item" onclick="loadSection('search')">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar</span>
+                </div>
+                <div class="nav-item" onclick="loadSection('playlists')">
+                    <i class="fas fa-list"></i>
+                    <span>Tu biblioteca</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <h3>PLAYLISTS</h3>
+                <div class="playlist-list" id="playlistContainer">
+                    <!-- Playlists se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="¿Qué quieres escuchar?" onkeypress="handleSearch(event)">
+                    <button onclick="performSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Home Section -->
+            <div id="homeSection">
+                <div class="section-header">
+                    <h2>Música Trending</h2>
+                </div>
+                <div class="tracks-grid" id="trendingGrid">
+                    <!-- Trending tracks se cargarán aquí -->
+                </div>
+                
+                <div class="section-header">
+                    <h2>Recomendaciones</h2>
+                </div>
+                <div class="tracks-grid" id="recommendationsGrid">
+                    <!-- Recommendations se cargarán aquí -->
+                </div>
+            </div>
+            
+            <!-- Search Results Section (hidden by default) -->
+            <div id="searchSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Resultados de búsqueda</h2>
+                </div>
+                <div class="tracks-grid" id="searchResultsGrid">
+                    <!-- Search results se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Player Bar -->
+        <div class="player-bar">
+            <div class="now-playing" id="nowPlaying">
+                <img id="currentTrackImage" src="https://via.placeholder.com/56" alt="Album Art">
+                <div class="track-info">
+                    <h4 id="currentTrackTitle">No hay pista seleccionada</h4>
+                    <p id="currentTrackArtist">Selecciona una canción para comenzar</p>
+                </div>
+            </div>
+            
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="playerControl('previous')">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="control-btn play-btn" id="playPauseBtn" onclick="togglePlayPause()">
+                        <i class="fas fa-play" id="playPauseIcon"></i>
+                    </button>
+                    <button class="control-btn" onclick="playerControl('next')">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                    <!-- BOTÓN DE REPETIR AGREGADO -->
+                    <button class="control-btn" id="repeatBtn" onclick="toggleRepeat()" title="Repetir desactivado">
+                        <i class="fas fa-redo" id="repeatIcon"></i>
+                    </button>
+                </div>
+                
+                <div class="progress-bar">
+                    <span class="progress-time" id="currentTime">0:00</span>
+                    <div class="progress-track" onclick="seekTrack(event)">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-time" id="totalTime">0:00</span>
+                </div>
+            </div>
+            
+            <div class="volume-control">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" id="volumeSlider" min="0" max="100" value="80" onchange="setVolume(this.value)">
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========== REPRODUCTOR DE YOUTUBE (OCULTO) ========== -->
+    <div id="youtubePlayerContainer" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 0; height: 0; z-index: 1000;">
+        <div id="youtubePlayer"></div>
+    </div>
+
+    <script>
+        // ========== VARIABLES GLOBALES ==========
+        let currentTrack = null;
+        let isPlaying = false;
+        let progressInterval = null;
+        let currentProgress = 0;
+        let totalDuration = 0;
+        let youtubePlayer;
+        let currentVideoId = '';
+        let repeatMode = 0; // 0=no repetir, 1=repetir una, 2=repetir todas
+        
+        // ========== FUNCIONES DE NAVEGACIÓN Y BÚSQUEDA ==========
+        
+        // Cargar contenido inicial
+        window.onload = function() {
+            loadYouTubeAPI();  // Cargar la API de YouTube
+            loadTrending();
+            loadPlaylists();
+        };
+        
+        // Navegación entre secciones
+        function loadSection(section) {
+            // Actualizar navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Mostrar sección correspondiente
+            document.getElementById('homeSection').style.display = section === 'home' ? 'block' : 'none';
+            document.getElementById('searchSection').style.display = section === 'search' ? 'block' : 'none';
+            
+            // Si es búsqueda, enfocar el input
+            if (section === 'search') {
+                document.getElementById('searchInput').focus();
+            }
+        }
+        
+        // Búsqueda
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+            
+            try {
+                const response = await fetch(`/api/search/search?q=${encodeURIComponent(query)}&limit=20`);
+                const data = await response.json();
+                
+                displaySearchResults(data.results);
+                
+                // Mostrar sección de resultados
+                loadSection('search');
+            } catch (error) {
+                console.error('Error en búsqueda:', error);
+            }
+        }
+        
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+        
+        function displaySearchResults(tracks) {
+            const container = document.getElementById('searchResultsGrid');
+            container.innerHTML = '';
+            
+            tracks.forEach(track => {
+                const trackElement = document.createElement('div');
+                trackElement.className = 'track-card';
+                trackElement.innerHTML = `
+                    <img src="${track.thumbnail}" alt="${track.title}">
+                    <h4>${track.title}</h4>
+                    <p>${track.channel_title}</p>
+                `;
+                trackElement.onclick = () => playTrack(track.video_id);
+                container.appendChild(trackElement);
+            });
+        }
+        
+        // Cargar trending
+        async function loadTrending() {
+            try {
+                const response = await fetch('/api/search/trending?limit=12');
+                const data = await response.json();
+                
+                displayTracks(data.trending, 'trendingGrid');
+                // Usar trending como recomendaciones también
+                displayTracks(data.trending.slice(0, 8), 'recommendationsGrid');
+            } catch (error) {
+                console.error('Error cargando trending:', error);
+            }
+        }
+        
+        function displayTracks(tracks, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            tracks.forEach(track => {
+                const trackElement = document.createElement('div');
+                trackElement.className = 'track-card';
+                trackElement.innerHTML = `
+                    <img src="${track.thumbnail}" alt="${track.title}">
+                    <h4>${track.title}</h4>
+                    <p>${track.channel_title}</p>
+                `;
+                trackElement.onclick = () => playTrack(track.video_id);
+                container.appendChild(trackElement);
+            });
+        }
+        
+        // Cargar playlists
+        async function loadPlaylists() {
+            try {
+                const response = await fetch('/api/playlists/playlists');
+                const data = await response.json();
+                
+                const container = document.getElementById('playlistContainer');
+                container.innerHTML = '';
+                
+                Object.values(data.playlists).forEach(playlist => {
+                    const playlistElement = document.createElement('div');
+                    playlistElement.className = 'nav-item';
+                    playlistElement.innerHTML = `
+                        <i class="fas fa-music"></i>
+                        <span>${playlist.name}</span>
+                    `;
+                    playlistElement.onclick = () => playPlaylist(playlist.id);
+                    container.appendChild(playlistElement);
+                });
+            } catch (error) {
+                console.error('Error cargando playlists:', error);
+            }
+        }
+        
+        // ========== FUNCIONES DEL REPRODUCTOR ==========
+        
+        // Modificar la función playTrack para usar YouTube
+        async function playTrack(videoId) {
+            try {
+                // Primero llamar a tu API existente (para mantener tu lógica)
+                const response = await fetch('/api/player/play', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ video_id: videoId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.track) {
+                    currentTrack = data.track;
+                    isPlaying = true;
+                    totalDuration = currentTrack.duration || 180; // 3 minutos por defecto
+                    
+                    updatePlayerUI();
+                    startProgressTimer();
+                    
+                    // AHORA REPRODUCIR CON YOUTUBE
+                    currentVideoId = videoId;
+                    if (youtubePlayer) {
+                        // Cargar y reproducir el video
+                        youtubePlayer.loadVideoById(videoId);
+                        youtubePlayer.playVideo();
+                        
+                        // Actualizar el volumen inicial
+                        const volume = document.getElementById('volumeSlider').value;
+                        youtubePlayer.setVolume(volume);
+                    }
+                }
+            } catch (error) {
+                console.error('Error reproduciendo pista:', error);
+                // Fallback: usar iframe simple
+                playWithSimpleIframe(videoId);
+            }
+        }
+        
+        // FUNCIÓN DE REPETIR AGREGADA
+        function toggleRepeat() {
+            repeatMode = (repeatMode + 1) % 3; // Ciclo: 0→1→2→0
+            
+            const repeatBtn = document.getElementById('repeatBtn');
+            const repeatIcon = document.getElementById('repeatIcon');
+            
+            switch(repeatMode) {
+                case 0: // No repetir
+                    repeatBtn.style.color = 'var(--light)';
+                    repeatIcon.className = 'fas fa-redo';
+                    repeatBtn.title = 'Repetir desactivado';
+                    break;
+                    
+                case 1: // Repetir una canción
+                    repeatBtn.style.color = 'var(--primary)';
+                    repeatIcon.className = 'fas fa-redo';
+                    repeatBtn.title = 'Repetir una canción';
+                    break;
+                    
+                case 2: // Repetir toda la cola/playlist
+                    repeatBtn.style.color = 'var(--primary)';
+                    repeatIcon.className = 'fas fa-infinity';
+                    repeatBtn.title = 'Repetir todas';
+                    break;
+            }
+        }
+        
+        async function togglePlayPause() {
+            if (!currentTrack) return;
+            
+            const endpoint = isPlaying ? '/api/player/pause' : '/api/player/resume';
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                isPlaying = data.player_state.is_playing;
+                
+                updatePlayPauseButton();
+                
+                if (isPlaying) {
+                    startProgressTimer();
+                    if (youtubePlayer) {
+                        youtubePlayer.playVideo();
+                    }
+                } else {
+                    stopProgressTimer();
+                    if (youtubePlayer) {
+                        youtubePlayer.pauseVideo();
+                    }
+                }
+            } catch (error) {
+                console.error('Error controlando reproducción:', error);
+            }
+        }
+        
+        async function playerControl(action) {
+            try {
+                let endpoint = '/api/player/';
+                
+                switch(action) {
+                    case 'previous':
+                        // Implementar lógica para anterior
+                        break;
+                    case 'next':
+                        endpoint += 'next';
+                        break;
+                    case 'stop':
+                        endpoint += 'stop';
+                        break;
+                }
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.track) {
+                    currentTrack = data.track;
+                    isPlaying = true;
+                    totalDuration = currentTrack.duration || 0;
+                    
+                    updatePlayerUI();
+                    startProgressTimer();
+                    
+                    // Reproducir en YouTube
+                    if (youtubePlayer && data.track.id) {
+                        currentVideoId = data.track.id;
+                        youtubePlayer.loadVideoById(currentVideoId);
+                        youtubePlayer.playVideo();
+                    }
+                }
+            } catch (error) {
+                console.error('Error en control:', error);
+            }
+        }
+        
+        function updatePlayerUI() {
+            if (currentTrack) {
+                document.getElementById('currentTrackImage').src = currentTrack.thumbnail;
+                document.getElementById('currentTrackTitle').textContent = currentTrack.title;
+                document.getElementById('currentTrackArtist').textContent = currentTrack.channel_title;
+                document.getElementById('totalTime').textContent = currentTrack.duration_formatted || '0:00';
+            }
+            
+            updatePlayPauseButton();
+        }
+        
+        function updatePlayPauseButton() {
+            const icon = document.getElementById('playPauseIcon');
+            icon.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        }
+        
+        // Control de progreso
+        function startProgressTimer() {
+            stopProgressTimer();
+            
+            progressInterval = setInterval(() => {
+                if (isPlaying && currentTrack) {
+                    currentProgress++;
+                    
+                    if (currentProgress >= totalDuration) {
+                        // Manejar según modo de repetición
+                        if (repeatMode === 1) {
+                            // Repetir misma canción
+                            currentProgress = 0;
+                            if (youtubePlayer) {
+                                youtubePlayer.seekTo(0, true);
+                                youtubePlayer.playVideo();
+                            }
+                        } else {
+                            playerControl('next');
+                        }
+                        return;
+                    }
+                    
+                    updateProgressUI();
+                }
+            }, 1000);
+        }
+        
+        function stopProgressTimer() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+        
+        function updateProgressUI() {
+            const progressPercent = (currentProgress / totalDuration) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            // Actualizar tiempo actual
+            const minutes = Math.floor(currentProgress / 60);
+            const seconds = Math.floor(currentProgress % 60);
+            document.getElementById('currentTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function seekTrack(event) {
+            if (!currentTrack || !totalDuration) return;
+            
+            const progressBar = event.currentTarget;
+            const rect = progressBar.getBoundingClientRect();
+            const clickPosition = event.clientX - rect.left;
+            const barWidth = rect.width;
+            const seekPercent = clickPosition / barWidth;
+            
+            currentProgress = Math.floor(seekPercent * totalDuration);
+            updateProgressUI();
+            
+            // Sincronizar con YouTube
+            if (youtubePlayer) {
+                youtubePlayer.seekTo(currentProgress, true);
+            }
+            
+            // También llamar a tu API
+            fetch('/api/player/progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ progress: currentProgress })
+            });
+        }
+        
+        // Control de volumen
+        async function setVolume(volume) {
+            if (youtubePlayer) {
+                youtubePlayer.setVolume(volume);
+            }
+            
+            // También llamar a tu API si quieres
+            try {
+                await fetch('/api/player/volume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ volume: parseInt(volume) })
+                });
+            } catch (error) {
+                console.error('Error ajustando volumen:', error);
+            }
+        }
+        
+        // Playlist functions
+        async function playPlaylist(playlistId) {
+            try {
+                const response = await fetch(`/api/playlists/playlists/${playlistId}/play`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.current_track) {
+                    currentTrack = data.current_track;
+                    isPlaying = true;
+                    totalDuration = currentTrack.duration || 0;
+                    
+                    updatePlayerUI();
+                    startProgressTimer();
+                    
+                    // Reproducir en YouTube
+                    if (youtubePlayer && data.current_track.id) {
+                        currentVideoId = data.current_track.id;
+                        youtubePlayer.loadVideoById(currentVideoId);
+                        youtubePlayer.playVideo();
+                    }
+                }
+            } catch (error) {
+                console.error('Error reproduciendo playlist:', error);
+            }
+        }
+        
+        async function createPlaylist() {
+            const name = prompt('Nombre de la nueva playlist:');
+            if (!name) return;
+            
+            try {
+                await fetch('/api/playlists/playlists/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: name })
+                });
+                
+                loadPlaylists();
+            } catch (error) {
+                console.error('Error creando playlist:', error);
+            }
+        }
+        
+        // Agregar a cola
+        async function addToQueue(videoId) {
+            try {
+                await fetch('/api/player/queue/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ video_id: videoId })
+                });
+                
+                alert('Añadido a la cola');
+            } catch (error) {
+                console.error('Error añadiendo a cola:', error);
+            }
+        }
+        
+        // ========== INTEGRACIÓN CON YOUTUBE PLAYER API ==========
+        
+        // 1. Cargar la API de YouTube
+        function loadYouTubeAPI() {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+        
+        // 2. Cuando la API esté lista
+        window.onYouTubeIframeAPIReady = function() {
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '0',
+                width: '0',
+                videoId: '',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'showinfo': 0
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        };
+        
+        function onPlayerReady(event) {
+            console.log('Reproductor de YouTube listo');
+        }
+        
+        function onPlayerStateChange(event) {
+            // Estados: -1=no iniciado, 0=terminado, 1=reproduciendo, 2=pausado, 3=buffering
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                updatePlayPauseButton();
+                startProgressTimer();
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                updatePlayPauseButton();
+                stopProgressTimer();
+            } else if (event.data == YT.PlayerState.ENDED) {
+                isPlaying = false;
+                updatePlayPauseButton();
+                stopProgressTimer();
+                
+                // Manejar según modo de repetición
+                if (repeatMode === 1) {
+                    // Repetir misma canción
+                    setTimeout(() => {
+                        if (youtubePlayer) {
+                            youtubePlayer.seekTo(0, true);
+                            youtubePlayer.playVideo();
+                        }
+                    }, 500);
+                } else {
+                    // Llamar a next track automáticamente
+                    playerControl('next');
+                }
+            }
+        }
+        
+        // 6. Función de respaldo por si YouTube API falla
+        function playWithSimpleIframe(videoId) {
+            // Crear un iframe simple
+            const playerContainer = document.getElementById('youtubePlayerContainer');
+            playerContainer.innerHTML = `
+                <iframe 
+                    width="300" 
+                    height="200" 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            playerContainer.style.width = '300px';
+            playerContainer.style.height = '200px';
+            playerContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
