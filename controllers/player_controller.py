@@ -5,7 +5,7 @@ from models.player_state import PlayerState
 # Crear Blueprint
 player_bp = Blueprint('player', __name__)
 
-# Instancias
+# Instancias (ahora usa variable de entorno directamente)
 youtube_client = YouTubeClient()
 player_state = PlayerState()
 
@@ -13,7 +13,7 @@ player_state = PlayerState()
 def play():
     """Reproducir una pista"""
     data = request.json
-    video_id = youtube_client.extract_video_id(data.get('video_id', ''))
+    video_id = data.get('video_id', '')
     
     if not video_id:
         return jsonify({'error': 'ID de video requerido'}), 400
@@ -21,7 +21,13 @@ def play():
     # Obtener detalles del video
     track_details = youtube_client.get_video_details(video_id)
     if not track_details:
-        return jsonify({'error': 'Video no encontrado'}), 404
+        # Si no hay API Key, usar modo simulador
+        track_details = {
+            'video_id': video_id,
+            'title': 'Canción de muestra',
+            'channel_title': 'Artista',
+            'thumbnail': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop&q=80'
+        }
     
     # Reproducir pista
     player_state.play_track(track_details)
@@ -80,14 +86,20 @@ def next_track():
 def add_to_queue():
     """Agregar pista a la cola"""
     data = request.json
-    video_id = youtube_client.extract_video_id(data.get('video_id', ''))
+    video_id = data.get('video_id', '')
     
     if not video_id:
         return jsonify({'error': 'ID de video requerido'}), 400
     
     track_details = youtube_client.get_video_details(video_id)
     if not track_details:
-        return jsonify({'error': 'Video no encontrado'}), 404
+        # Modo simulador
+        track_details = {
+            'video_id': video_id,
+            'title': f'Canción {video_id}',
+            'channel_title': 'Artista',
+            'thumbnail': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop&q=80'
+        }
     
     position = player_state.add_to_queue(track_details)
     

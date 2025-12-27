@@ -1,0 +1,41 @@
+<div class="player-bar">
+    <div class="now-playing">
+        <img id="currentTrackImage" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop&q=80" alt="Album">
+        <div class="track-info">
+            <h4 id="currentTrackTitle">No hay canción seleccionada</h4>
+            <p id="currentTrackArtist">Selecciona una canción para comenzar</p>
+        </div>
+    </div>
+   
+    <div class="volume-control">
+        <i class="fas fa-volume-up" id="volumeIcon"></i>
+        <input type="range" id="volumeSlider" min="0" max="100" value="80">
+    </div>
+   
+    <div class="player-controls">
+        <div class="control-buttons">
+            <button class="control-btn" id="shuffleBtn">
+                <i class="fas fa-random"></i>
+            </button>
+            <button class="control-btn" id="previousBtn">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button class="control-btn play-btn" id="playPauseBtn">
+                <i class="fas fa-play" id="playPauseIcon"></i>
+            </button>
+            <button class="control-btn" id="nextBtn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <button class="control-btn" id="repeatBtn">
+                <i class="fas fa-redo" id="repeatIcon"></i>
+            </button>
+        </div>
+        <div class="progress-bar">
+            <span class="progress-time" id="currentTime">0:00</span>
+            <div class="progress-track" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-time" id="totalTime">0:00</span>
+        </div>
+    </div>
+</div>

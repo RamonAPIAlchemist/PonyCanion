@@ -1,76 +1,188 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>YouTube API en Flask</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        .code { background: #333; color: #fff; padding: 10px; border-radius: 3px; }
-        input, button { padding: 8px; margin: 5px; }
-        .result { background: #e8f5e8; padding: 10px; margin: 10px 0; border-left: 4px solid #4CAF50; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PonyCanion - Reproductor Musical</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/player.css') }}">
 </head>
 <body>
-    <h1>YouTube Data API Demo</h1>
-    
-    <div class="endpoint">
-        <h2>1. Buscar Videos</h2>
-        <input type="text" id="searchQuery" placeholder="Buscar videos...">
-        <button onclick="searchVideos()">Buscar</button>
-        <div id="searchResult"></div>
+    <!-- Header móvil -->
+    <div class="mobile-header">
+        <div class="mobile-header-content">
+            <h1><i class="fas fa-fire"></i> PonyCanion</h1>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
     </div>
     
-    <div class="endpoint">
-        <h2>2. Detalles de Video</h2>
-        <input type="text" id="videoId" placeholder="ID del video (ej: dQw4w9WgXcQ)">
-        <button onclick="getVideoDetails()">Obtener detalles</button>
-        <div id="videoResult"></div>
+    <!-- Navegación móvil -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-items">
+            <div class="mobile-nav-item active" onclick="loadSection('home'); toggleMobileMenu();">
+                <i class="fas fa-home"></i><span>Inicio</span>
+            </div>
+            <div class="mobile-nav-item" onclick="loadSection('search'); toggleMobileMenu();">
+                <i class="fas fa-search"></i><span>Buscar</span>
+            </div>
+            <div class="mobile-nav-item" onclick="loadSection('library'); toggleMobileMenu();">
+                <i class="fas fa-music"></i><span>Tu música</span>
+            </div>
+        </div>
     </div>
-    
-    <div class="endpoint">
-        <h2>3. Videos Trending</h2>
-        <input type="text" id="regionCode" placeholder="Código región (ej: US, MX, ES)" value="US">
-        <button onclick="getTrending()">Obtener trending</button>
-        <div id="trendingResult"></div>
+   
+    <div class="app-container">
+        <div class="app-header"></div>
+        
+        <!-- Sidebar para PC -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-fire"></i> PonyCanion</h1>
+                <div class="tagline">Tu música, a todo volumen</div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-item active" onclick="loadSection('home')">
+                    <i class="fas fa-home"></i><span>Inicio</span>
+                </div>
+                <div class="nav-item" onclick="loadSection('search')">
+                    <i class="fas fa-search"></i><span>Buscar</span>
+                </div>
+                <div class="nav-item" onclick="loadSection('library')">
+                    <i class="fas fa-music"></i><span>Tu música</span>
+                </div>
+            </div>
+            <div class="playlists-section">
+                <h3>Tus Playlists</h3>
+                <div id="playlistsSidebar"></div>
+            </div>
+        </div>
+       
+        <div class="main-content-wrapper">
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Busca canciones, artistas o álbumes...">
+                            <button id="searchButton"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="homeSection" class="content-section active">
+                    <div class="section-header">
+                        <div>
+                            <h2>Bienvenido de nuevo</h2>
+                            <div class="subtitle">Tus canciones recientes y recomendaciones</div>
+                        </div>
+                    </div>
+                    <div class="tracks-grid" id="recentGrid"></div>
+                    
+                    <div class="section-header">
+                        <div>
+                            <h2>Recomendaciones para ti</h2>
+                            <div class="subtitle">Basado en tu actividad de escucha</div>
+                        </div>
+                    </div>
+                    <div class="tracks-grid" id="recommendationsGrid"></div>
+                </div>
+               
+                <div id="searchSection" class="content-section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Resultados de búsqueda</h2>
+                            <div class="subtitle" id="searchStats">Escribe para buscar música</div>
+                        </div>
+                    </div>
+                    <div class="tracks-grid" id="searchResultsGrid"></div>
+                </div>
+               
+                <div id="librarySection" class="content-section">
+                    <div class="section-header">
+                        <div>
+                            <h2>Tu biblioteca</h2>
+                            <div class="subtitle">Tus playlists y colecciones</div>
+                        </div>
+                        <button onclick="createPlaylist()" style="padding: 10px 20px; font-size: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> Nueva playlist
+                        </button>
+                    </div>
+                    <div class="tracks-grid" id="playlistsGrid"></div>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Player Bar -->
+        <div class="player-bar">
+            <div class="now-playing">
+                <img id="currentTrackImage" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop&q=80" alt="Album">
+                <div class="track-info">
+                    <h4 id="currentTrackTitle">No hay canción seleccionada</h4>
+                    <p id="currentTrackArtist">Selecciona una canción para comenzar</p>
+                </div>
+            </div>
+           
+            <div class="volume-control">
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+                <input type="range" id="volumeSlider" min="0" max="100" value="80">
+            </div>
+           
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" id="shuffleBtn">
+                        <i class="fas fa-random"></i>
+                    </button>
+                    <button class="control-btn" id="previousBtn">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="control-btn play-btn" id="playPauseBtn">
+                        <i class="fas fa-play" id="playPauseIcon"></i>
+                    </button>
+                    <button class="control-btn" id="nextBtn">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                    <button class="control-btn" id="repeatBtn">
+                        <i class="fas fa-redo" id="repeatIcon"></i>
+                    </button>
+                </div>
+                <div class="progress-bar">
+                    <span class="progress-time" id="currentTime">0:00</span>
+                    <div class="progress-track" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-time" id="totalTime">0:00</span>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="endpoint">
-        <h2>Endpoints disponibles:</h2>
-        <pre class="code">
-GET /search?q=python&max_results=10
-GET /video/VIDEO_ID
-GET /channel/CHANNEL_ID
-GET /trending?region=US&max_results=10
-GET /comments/VIDEO_ID?max_results=20
-        </pre>
+   
+    <!-- YouTube Player Container (INVISIBLE) -->
+    <div id="youtubePlayerContainer" style="display: none; position: fixed; top: -1000px; left: -1000px; width: 0; height: 0;">
+        <div id="youtubePlayer"></div>
     </div>
-
+   
     <script>
-        async function searchVideos() {
-            const query = document.getElementById('searchQuery').value;
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-            const data = await response.json();
-            displayResult('searchResult', data);
+    // SOLUCIÓN DE EMERGENCIA - FORZAR API KEY
+    window.YOUTUBE_API_KEY = 'AIzaSyCM_CtJicmYaaTPcgJjApwXv9gej8m2b9Y';
+    window.HAS_API_KEY = true;
+    
+    console.log('🟢 API KEY FORZADA:', window.YOUTUBE_API_KEY.substring(0, 20) + '...');
+    console.log('🔵 HAS_API_KEY:', window.HAS_API_KEY);
+    
+    // Recargar player.js para que use la nueva API Key
+    setTimeout(() => {
+        if (typeof initializeYouTubePlayer === 'function') {
+            console.log('🔄 Reinicializando YouTube Player...');
+            if (window.youtubePlayer) {
+                window.youtubePlayer.destroy();
+            }
+            initializeYouTubePlayer();
         }
-        
-        async function getVideoDetails() {
-            const videoId = document.getElementById('videoId').value;
-            const response = await fetch(`/video/${videoId}`);
-            const data = await response.json();
-            displayResult('videoResult', data);
-        }
-        
-        async function getTrending() {
-            const region = document.getElementById('regionCode').value;
-            const response = await fetch(`/trending?region=${region}`);
-            const data = await response.json();
-            displayResult('trendingResult', data);
-        }
-        
-        function displayResult(elementId, data) {
-            const element = document.getElementById(elementId);
-            element.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-        }
-    </script>
+    }, 1000);
+</script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
 </body>
 </html>
