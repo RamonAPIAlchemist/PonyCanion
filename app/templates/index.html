@@ -163,24 +163,25 @@
         <div id="youtubePlayer"></div>
     </div>
    
-    <script>
-    // SOLUCIÓN DE EMERGENCIA - FORZAR API KEY
+   <script>
+    // Forzar API Key y hacer que funcione en móvil
     window.YOUTUBE_API_KEY = 'AIzaSyCM_CtJicmYaaTPcgJjApwXv9gej8m2b9Y';
     window.HAS_API_KEY = true;
     
-    console.log('🟢 API KEY FORZADA:', window.YOUTUBE_API_KEY.substring(0, 20) + '...');
-    console.log('🔵 HAS_API_KEY:', window.HAS_API_KEY);
+    // Para móvil en segundo plano
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
     
-    // Recargar player.js para que use la nueva API Key
-    setTimeout(() => {
-        if (typeof initializeYouTubePlayer === 'function') {
-            console.log('🔄 Reinicializando YouTube Player...');
-            if (window.youtubePlayer) {
-                window.youtubePlayer.destroy();
-            }
-            initializeYouTubePlayer();
-        }
-    }, 1000);
+    // Evitar que el navegador duerma en móvil
+    let wakeLock = null;
+    if ('wakeLock' in navigator) {
+        navigator.wakeLock.request('screen').then(wl => {
+            wakeLock = wl;
+        });
+    }
+    
+    console.log('📱 PonyCanion - Optimizado para móvil');
 </script>
     <script src="{{ url_for('static', filename='js/search.js') }}"></script>
     <script src="{{ url_for('static', filename='js/player.js') }}"></script>

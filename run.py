@@ -7,13 +7,13 @@ from flask_cors import CORS
 load_dotenv()
 
 # Importar blueprints
-from controllers.player_controller import player_bp
-from controllers.search_controller import search_bp
-from controllers.playlist_controller import playlist_bp
+from app.controllers.player_controller import player_bp
+from app.controllers.search_controller import search_bp
+from app.controllers.playlist_controller import playlist_bp
 
 app = Flask(__name__, 
-            static_folder='static',
-            template_folder='templates')
+            static_folder='app/static',
+            template_folder='app/templates')
 CORS(app)
 
 # Configuración

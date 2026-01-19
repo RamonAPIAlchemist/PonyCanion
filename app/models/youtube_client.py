@@ -30,10 +30,9 @@ class YouTubeClient:
             match = re.search(pattern, url_or_id)
             if match:
                 return match.group(1)
-        return url_or_id  # Si no es URL, asumimos que ya es ID
+        return url_or_id
     
     def search_videos(self, query, max_results=20, music_only=True):
-        """Buscar videos en YouTube"""
         if not self.has_api:
             return self.search_simulated(query, max_results)
             
@@ -67,7 +66,6 @@ class YouTubeClient:
             return self.search_simulated(query, max_results)
     
     def search_simulated(self, query, max_results=20):
-        """Búsqueda simulada para cuando no hay API Key"""
         artists = ['Shakira', 'Bad Bunny', 'Taylor Swift', 'The Weeknd', 'Dua Lipa', 'Ed Sheeran', 'Karol G', 'Feid', 'Rosalía', 'J Balvin']
         genres = ['Pop', 'Rock', 'Reggaeton', 'Hip Hop', 'Electrónica', 'Indie']
         
@@ -89,7 +87,6 @@ class YouTubeClient:
         return videos
     
     def get_video_details(self, video_id):
-        """Obtener detalles completos de un video"""
         if not self.has_api:
             return self.get_video_details_simulated(video_id)
             
@@ -104,7 +101,6 @@ class YouTubeClient:
             
             video = video_response['items'][0]
             
-            # Parsear duración
             duration_iso = video['contentDetails']['duration']
             duration_seconds = self._parse_duration(duration_iso)
             
@@ -129,7 +125,6 @@ class YouTubeClient:
             return self.get_video_details_simulated(video_id)
     
     def get_video_details_simulated(self, video_id):
-        """Detalles simulados de video"""
         return {
             'video_id': video_id,
             'title': 'Canción de muestra',
@@ -145,7 +140,6 @@ class YouTubeClient:
         }
     
     def get_related_videos(self, video_id, max_results=10):
-        """Obtener videos relacionados"""
         if not self.has_api:
             return self.get_related_simulated(video_id, max_results)
             
@@ -174,7 +168,6 @@ class YouTubeClient:
             return self.get_related_simulated(video_id, max_results)
     
     def get_related_simulated(self, video_id, max_results=10):
-        """Videos relacionados simulados"""
         related = []
         for i in range(max_results):
             related.append({
@@ -186,7 +179,6 @@ class YouTubeClient:
         return related
     
     def get_trending_music(self, region='US', max_results=20):
-        """Obtener música trending"""
         if not self.has_api:
             return self.get_trending_simulated(max_results)
             
@@ -218,7 +210,6 @@ class YouTubeClient:
             return self.get_trending_simulated(max_results)
     
     def get_trending_simulated(self, max_results=20):
-        """Trending simulados"""
         trending_titles = [
             'Blinding Lights - The Weeknd',
             'Shape of You - Ed Sheeran',
@@ -243,7 +234,6 @@ class YouTubeClient:
         return trending
     
     def _parse_duration(self, duration_iso):
-        """Convertir duración ISO 8601 a segundos"""
         match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', duration_iso)
         if not match:
             return 0
@@ -255,7 +245,6 @@ class YouTubeClient:
         return hours * 3600 + minutes * 60 + seconds
     
     def _format_duration(self, seconds):
-        """Formatear segundos a MM:SS o HH:MM:SS"""
         hours = seconds // 3600
         minutes = (seconds % 3600) // 60
         secs = seconds % 60
